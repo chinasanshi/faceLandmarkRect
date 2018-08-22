@@ -1,40 +1,41 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # import the necessary packages
-from scipy.spatial import distance as dist
-from imutils import face_utils
+
+
 import numpy as np
-import argparse
-import imutils
-import time
 import dlib
 import cv2
+import imutils
+from imutils import face_utils
+from scipy.spatial import distance as dist
 
 
+# 论文 Real-Time Eye Blink Detection using Facial Landmarks
 def eye_aspect_ratio(eye):
-    # 计算两个集合之间的欧几里得距离
-    # 垂直眼标志（X，Y）坐标
+    # 眼睛垂直距离
     A = dist.euclidean(eye[1], eye[5])
     B = dist.euclidean(eye[2], eye[4])
-    # 计算水平之间的欧几里得距离
-    # 水平眼标志（X，Y）坐标
+    # 眼睛水平距离
     C = dist.euclidean(eye[0], eye[3])
-    # 眼睛长宽比的计算
+    # 使用两者的比值来度量眨眼
     ear = (A + B) / (2.0 * C)
-    # 返回眼镜的长宽比
     return ear
 
 
-# 眼睛长宽比
-# 闪烁阈值
+# 眼睛长宽比阈值
 EYE_AR_THRESH = 0.2
-EYE_AR_CONSEC_FRAMES = 3
+# 噪声阈值 -- 可自行调节
+# 自测发现 2 帧时检测眨眼效果比 3 帧好，但噪声较大
+EYE_AR_CONSEC_FRAMES = 2
+# 疲劳阈值
 EYE_AR_CONSEC_FRAMES_SLEEP = 10
-# 初始化帧计数器和眨眼总数
+
+# 统计噪声
 COUNTER = 0
+# 眨眼次数
 TOTAL = 0
 
-# 初始化 DLIB 的人脸检测器（HOG）
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
 
@@ -80,7 +81,7 @@ while True:
             # 消除抖动噪声
             if COUNTER >= EYE_AR_CONSEC_FRAMES:
                 TOTAL += 1
-            # 重置眼帧计数器
+
             COUNTER = 0
 
 
@@ -92,9 +93,9 @@ while True:
     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
     cv2.imshow("Frame", frame)
-    # if the `q` key was pressed, break from the loop
+
     if cv2.waitKey(33) & 0xFF == ord('q'):
         break
 
-# do a bit of cleanup
+
 cv2.destroyAllWindows()
