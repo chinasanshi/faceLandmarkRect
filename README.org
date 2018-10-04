@@ -2,6 +2,11 @@
 ** 概述
 使用 Python3 ，利用 Dlib 库实现人脸关键点检测与识别；同时使用 tkinter 库实现了一个简单的界面
 
+** landmark
+
+[[landmark.png]]
+
+
 ** 功能
 1. 人脸 landmark 检测；可设置成全黑色背景
 2. 人脸验证
